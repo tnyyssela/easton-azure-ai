@@ -4,19 +4,20 @@
   "description": "Azure app for Slalom Drone Challenge",
   "main": "sdc-cv.js",
   "scripts": {
-    "test": "node sdc-cv.js"
+    "sdc": "node sdc-cv.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tnyyssela/easton-azure-ai.git"
+    "url": "git+https://github.com/tnyyssela/slalom-drone-azurecv.git"
   },
   "author": "tristan.nyyssela",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/tnyyssela/easton-azure-ai/issues"
+    "url": "https://github.com/tnyyssela/slalom-drone-azurecv/issues"
   },
-  "homepage": "https://github.com/tnyyssela/easton-azure-ai#readme",
+  "homepage": "https://github.com/tnyyssela/slalom-drone-azurecv#readme",
   "dependencies": {
+    "jshint": "^2.9.5",
     "kafka-rest": "0.0.5",
     "opencv": "^6.0.0",
     "request": "^2.82.0"
