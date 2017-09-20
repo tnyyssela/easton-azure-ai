@@ -122,6 +122,9 @@ var cvDetect = function(img) {
             im.ellipse(person.x + person.width / 2, person.y + person.height / 2, person.width / 2, person.height / 2, [255, 255, 0], 3);
         }
 
+        //To visually verify bounding as necessary
+        //im.save('test.jpg');
+        
         var buff = im.toBuffer();
 
         //Add image binary to kfkObj
