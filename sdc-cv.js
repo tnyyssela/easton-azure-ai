@@ -123,7 +123,8 @@ var cvDetect = function(img) {
         }
 
         //To visually verify bounding as necessary
-        //im.save('test.jpg');
+        // im.save('test.jpg');
+        // console.log('img saved');
         
         var buff = im.toBuffer();
 
