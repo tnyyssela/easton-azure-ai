@@ -12,27 +12,23 @@ var kfkObj = [];
 //*****************************************************/
 
 //Subscribe and log from 'test' topic 
-//TODO: GET THIS WORKING WITH REAL KAFKA STUFFS!
-// var kfkCon = function () {
-//         kafka.consumer("my-consumer").join({
-//         "format": "binary",
-//         "auto.offset.reset": "smallest"
-//         }, function(err, consumer_instance) {
-//         var stream = consumer_instance.subscribe('drone1_successfullAIResults'); //TODO: need to update to vid stream
+var kfkCon = function () {
+        kafka.consumer("my-consumer").join({
+        "format": "binary",
+        "auto.offset.reset": "smallest"
+        }, function(err, consumer_instance) {
+        var stream = consumer_instance.subscribe('videoFrames');
 
-//         stream.on('data', function(msgs) {
-//             for(var i = 0; i < msgs.length; i++)
-//                 console.log("Got a message: key=" + msgs[i].key + " value=" + msgs[i].value + " partition=" + msgs[i].partition);
+        stream.on('data', function(msgs) {
+            for(var i = 0; i < msgs.length; i++)
+                console.log("Got a message: key=" + msgs[i].key + " value=" + msgs[i].value + " partition=" + msgs[i].partition);
             
-//                 //Send to azure to describe img
-//                 // az_describe(msgs[i].value); //TODO: update to whatever this msgs img data val actually is
+                //Send to azure to describe img
+                az_describe(msgs[i].value);
 
-//                 //Add location to kfkObj
-//                 //kfkObj.push({"location": msgs[i].value.location}); //TODO: whatever this loc obj actually is
-
-//         });
-//     });
-// };
+        });
+    });
+};
 
 
 //*****************************************************/
@@ -149,7 +145,7 @@ var kfkProd = function(kfkObj){
 
     console.log(kfkObj);
     //Push to 'test' topic
-    kafka.topic('drone1_successfullAIResults')
+    kafka.topic('successfullAIResults')
         .produce(kfkObj,
         function(err, response) {
             if(err){
@@ -161,8 +157,12 @@ var kfkProd = function(kfkObj){
     );
 };
 
-//Test Image
-var imgBinary = fs.readFileSync('30.jpg');
+//*****************************************************/
+//Manual Tests
+//*****************************************************/
 
-az_describe(imgBinary);
+//Test Image
+// var imgBinary = fs.readFileSync('30.jpg');
+
+// az_describe(imgBinary);
 // cvDetect(imgBinary);
