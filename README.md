@@ -3,7 +3,7 @@ Description:
 
   * consume img and loc data from kafka
   * pass img to azure for CV img desc
-  * pass img to OpenCV for bounding box
+  * if azure says we have a person - pass img to OpenCV for bounding box
   * publish location, azure desc, bounding box to kafka via producer
 
 Dependencies:
