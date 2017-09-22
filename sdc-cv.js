@@ -185,4 +185,4 @@ var kfkProd = function(kfkObj){
 
 // az_describe(imgBinary);
 // cvDetect(imgBinary);
-// kfkCon();
+kfkCon();
