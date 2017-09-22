@@ -145,8 +145,8 @@ var cvDetect = function(img) {
                 kfkObj.push({'key': 'ocv_bounding', 'value': ocv_bounds});   
                 
                 //To visually verify bounding as necessary
-                im.save(Date.now() +'.jpg');
-                console.log('img saved');
+                // im.save(Date.now() +'.jpg');
+                // console.log('img saved');
                 
                 //publish kfkObj to kafka
                 kfkProd(kfkObj);
