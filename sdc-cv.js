@@ -13,19 +13,32 @@ var kfkObj = [];
 
 //Subscribe and log from 'test' topic 
 var kfkCon = function () {
-        kafka.consumer("my-consumer").join({
-        "format": "binary",
-        "auto.offset.reset": "smallest"
+        kafka.consumer("azurecv-consumer").join({
+        "format": "binary"
         }, function(err, consumer_instance) {
         var stream = consumer_instance.subscribe('videoFrames');
 
         stream.on('data', function(msgs) {
-            for(var i = 0; i < msgs.length; i++)
-                console.log("Got a message: key=" + msgs[i].key + " value=" + msgs[i].value + " partition=" + msgs[i].partition);
-            
-                //Send to azure to describe img
-                az_describe(msgs[i].value);
+            for(var i = 0; i < msgs.length; i++) {
+                var val = msgs[i].value;//.toString('utf8');
+                var json = JSON.parse(val);
 
+                //Add coordinates to kfkObj
+                kfkObj.push({'key': 'coordinate', 'value' : json['coordinate']});
+                            
+                var frame = json['frame'];
+                var buf = Buffer.from(frame, 'base64');
+                
+                //Send to azure to describe img
+                // console.log(buf);
+                az_describe(buf);
+    
+            }
+        });
+        stream.on('error', function(err) {
+            console.log("Consumer instance reported an error: " + err);
+            console.log("Attempting to shut down consumer instance...");
+            consumer_instance.shutdown();
         });
     });
 };
@@ -57,11 +70,15 @@ var az_describe = function (img){
             // Print out the response body
             console.log(body);
 
-            //publish azure tags json to kafka
-            kfkObj.push({'key': 'az_desc', 'value': body});
+            //If person publish azure tags json to kafka
+            if(body.includes('person') || body.includes('man') ||
+            body.includes('woman') || body.includes('child') || body.includes('people')) {
 
-            //Send to OpenCV for bounding boxes
-            cvDetect(img);
+                kfkObj.push({'key': 'az_desc', 'value': body});
+                
+                //& send to OpenCV for bounding boxes
+                cvDetect(img);
+            }
 
         } else {
             console.log("error from service : " + response.body);
@@ -119,14 +136,14 @@ var cvDetect = function(img) {
         }
 
         //To visually verify bounding as necessary
-        // im.save('test.jpg');
+        // im.save(Date.now() +'.jpg');
         // console.log('img saved');
         
-        var buff = im.toBuffer();
+        var ocv_bounds = im.toBuffer().toString('base64');
 
         //Add image binary to kfkObj
-        if(buff){
-            kfkObj.push({'key': 'ocv_bounding', 'value': buff});            
+        if(ocv_bounds){
+            kfkObj.push({'key': 'ocv_bounding', 'value': ocv_bounds});            
         }
         
         //publish kfkObj to kafka
@@ -142,19 +159,21 @@ var cvDetect = function(img) {
 //*****************************************************/
 
 var kfkProd = function(kfkObj){ 
-
-    console.log(kfkObj);
-    //Push to 'test' topic
-    kafka.topic('successfullAIResults')
-        .produce(kfkObj,
-        function(err, response) {
-            if(err){
-                console.log(err);
-            } else {
-                console.log(response);
+    if(!kfkObj){
+        console.log('kfkObj is EMPTY!');
+    } else {
+        //Push to 'test' topic
+        kafka.topic('successfullAIResults')
+            .produce(kfkObj.toString('base64'),
+            function(err, response) {
+                if(err){
+                    console.log(err);
+                } else {
+                    console.log(response);
+                }
             }
-        }
-    );
+        );
+    }
 };
 
 //*****************************************************/
@@ -162,7 +181,8 @@ var kfkProd = function(kfkObj){
 //*****************************************************/
 
 //Test Image
-// var imgBinary = fs.readFileSync('30.jpg');
+// var imgBinary = fs.readFileSync('woods.jpg');
 
 // az_describe(imgBinary);
 // cvDetect(imgBinary);
+// kfkCon();
