@@ -163,7 +163,7 @@ var kfkProd = function(kfkObj){
         console.log('kfkObj is EMPTY!');
     } else {
         //Push to 'test' topic
-        kafka.topic('successfullAIResults')
+        kafka.topic('successfulAIResults')
             .produce(kfkObj.toString('base64'),
             function(err, response) {
                 if(err){
