@@ -20,8 +20,3 @@ Installation:
   * update KafkaRest endpoint at top of sdc-cv.js file
   * npm install
   * npm run sdc
-
-TODO:
-==========
-  * Fix kafka consumer to interact with actual data stream
-  * Verify producer is delivering data as UWP/Hololens expects
