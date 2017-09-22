@@ -68,7 +68,7 @@ var az_describe = function (img){
     request(options, function (error, response, body) {
         if (!error && response.statusCode == 200) {
             // Print out the response body
-            console.log(body);
+            // console.log(body);
 
             //If person publish azure tags json to kafka
             if(body.includes('person') || body.includes('man') ||
@@ -128,26 +128,29 @@ var cvDetect = function(img) {
     if (im.width() < 1 || im.height() < 1) throw new Error('Image has no size');
   
         im.detectObject('./node_modules/opencv/data/haarcascade_fullbody.xml', {}, function(err, persons){
-        if (err) throw err;
-    
-        for (var i = 0; i < persons.length; i++){
-            var person = persons[i];
-            im.ellipse(person.x + person.width / 2, person.y + person.height / 2, person.width / 2, person.height / 2, [255, 255, 0], 3);
-        }
-
-        //To visually verify bounding as necessary
-        // im.save(Date.now() +'.jpg');
-        // console.log('img saved');
+            if (err) throw err;
         
-        var ocv_bounds = im.toBuffer().toString('base64');
+            if(persons){
+                for (var i = 0; i < persons.length; i++){
+                    var person = persons[i];
+                    im.ellipse(person.x + person.width / 2, person.y + person.height / 2, person.width / 2, person.height / 2, [255, 255, 0], 3);
+                }
 
-        //Add image binary to kfkObj
-        if(ocv_bounds){
-            kfkObj.push({'key': 'ocv_bounding', 'value': ocv_bounds});            
-        }
-        
-        //publish kfkObj to kafka
-        kfkProd(kfkObj);
+                // console.log(im.toBuffer());
+                var ocv_bounds = im.toBuffer().toString('base64');
+
+                // console.log(img);
+                
+                //Add image binary to kfkObj
+                kfkObj.push({'key': 'ocv_bounding', 'value': ocv_bounds});   
+                
+                //To visually verify bounding as necessary
+                im.save(Date.now() +'.jpg');
+                console.log('img saved');
+                
+                //publish kfkObj to kafka
+                kfkProd(kfkObj);
+            }
 
         });
     });
